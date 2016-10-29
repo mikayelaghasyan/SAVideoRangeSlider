@@ -64,6 +64,8 @@
     [highlightShadow setShadowOffset: CGSizeMake(0.1, 2.1)];
     [highlightShadow setShadowBlurRadius: 0];
     
+    //// Frames
+    CGRect bubbleFrame = self.bounds;
     
     //// Subframes
     CGRect arrowFrame = CGRectMake(CGRectGetMinX(bubbleFrame) + floor((CGRectGetWidth(bubbleFrame) - 59) * 0.50462 + 0.5), CGRectGetMinY(bubbleFrame) + CGRectGetHeight(bubbleFrame) - 46, 59, 46);
