@@ -41,28 +41,19 @@
 // An empty implementation adversely affects performance during animation.
 - (void)drawRect:(CGRect)rect
 {
-    // Drawing code
-    
     //// General Declarations
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
     CGContextRef context = UIGraphicsGetCurrentContext();
     
     //// Color Declarations
-    UIColor* color5 = [UIColor colorWithRed: 0.992 green: 0.902 blue: 0.004 alpha: 1];
+    UIColor* gradientColor = [UIColor colorWithRed: 0.98 green: 0.365 blue: 0.408 alpha: 1];
     UIColor* gradientColor2 = [UIColor colorWithRed: 1 green: 1 blue: 1 alpha: 1];
-    UIColor* color6 = [UIColor colorWithRed: 0.196 green: 0.161 blue: 0.047 alpha: 1];
+    UIColor* color6 = [UIColor colorWithRed: 0.231 green: 0.231 blue: 0.231 alpha: 1];
+    UIColor* color7 = [UIColor colorWithRed: 0 green: 0 blue: 0 alpha: 0];
     
     //// Gradient Declarations
-    NSArray* gradient3Colors = [NSArray arrayWithObjects:
-                                (id)gradientColor2.CGColor,
-                                (id)[UIColor colorWithRed: 0.996 green: 0.951 blue: 0.502 alpha: 1].CGColor,
-                                (id)color5.CGColor, nil];
-    CGFloat gradient3Locations[] = {0, 0, 0.49};
-    CGGradientRef gradient3 = CGGradientCreateWithColors(colorSpace, (__bridge CFArrayRef)gradient3Colors, gradient3Locations);
-    
-    //// Frames
-    CGRect bubbleFrame = self.bounds;
-    
+    CGFloat gradientPurpleLocations[] = {0, 0, 1};
+    CGGradientRef gradientPurple = CGGradientCreateWithColors(colorSpace, (__bridge CFArrayRef)@[(id)gradientColor2.CGColor, (id)[gradientColor2 blendedColorWithFraction: 0.5 ofColor: gradientColor].CGColor, (id)gradientColor.CGColor], gradientPurpleLocations);
     
     //// Rounded Rectangle Drawing
     CGRect roundedRectangleRect = CGRectMake(CGRectGetMinX(bubbleFrame), CGRectGetMinY(bubbleFrame), CGRectGetWidth(bubbleFrame), CGRectGetHeight(bubbleFrame));
@@ -70,12 +61,12 @@
     [roundedRectanglePath closePath];
     CGContextSaveGState(context);
     [roundedRectanglePath addClip];
-    CGContextDrawLinearGradient(context, gradient3,
+    CGContextDrawLinearGradient(context, gradientPurple,
                                 CGPointMake(CGRectGetMidX(roundedRectangleRect), CGRectGetMinY(roundedRectangleRect)),
                                 CGPointMake(CGRectGetMidX(roundedRectangleRect), CGRectGetMaxY(roundedRectangleRect)),
                                 0);
     CGContextRestoreGState(context);
-    [[UIColor clearColor] setStroke];
+    [color7 setStroke];
     roundedRectanglePath.lineWidth = 0.5;
     [roundedRectanglePath stroke];
     
@@ -109,13 +100,8 @@
     
     
     //// Cleanup
-    CGGradientRelease(gradient3);
+    CGGradientRelease(gradientPurple);
     CGColorSpaceRelease(colorSpace);
-    
-    
-    
-    
-    
 }
 
 

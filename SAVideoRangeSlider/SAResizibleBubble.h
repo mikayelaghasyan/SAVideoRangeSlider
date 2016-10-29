@@ -1,6 +1,8 @@
 //
 //  SAResizibleBubble.h
 //
+// This code is distributed under the terms and conditions of the MIT license.
+//
 // Copyright (c) 2013 Andrei Solovjev - http://solovjev.com/
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
