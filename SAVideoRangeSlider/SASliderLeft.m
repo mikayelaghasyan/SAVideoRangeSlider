@@ -49,15 +49,19 @@
     UIColor* gradientColor = [UIColor colorWithRed: 0.98 green: 0.365 blue: 0.408 alpha: 1];
     UIColor* gradientColor2 = [UIColor colorWithRed: 1 green: 1 blue: 1 alpha: 1];
     UIColor* color6 = [UIColor colorWithRed: 0.231 green: 0.231 blue: 0.231 alpha: 1];
-    UIColor* color7 = [UIColor colorWithRed: 0 green: 0 blue: 0 alpha: 0];
     
     //// Gradient Declarations
+    NSArray* gradientPurpleColors = [NSArray arrayWithObjects:
+                                     (id)gradientColor2.CGColor,
+                                     (id)[UIColor colorWithRed: 0.99 green: 0.6825 blue: 0.704 alpha: 1].CGColor,
+                                     (id)gradientColor.CGColor, nil];
     CGFloat gradientPurpleLocations[] = {0, 0, 1};
-    CGGradientRef gradientPurple = CGGradientCreateWithColors(colorSpace, (__bridge CFArrayRef)@[(id)gradientColor2.CGColor, (id)[gradientColor2 blendedColorWithFraction: 0.5 ofColor: gradientColor].CGColor, (id)gradientColor.CGColor], gradientPurpleLocations);
+    CGGradientRef gradientPurple = CGGradientCreateWithColors(colorSpace, (__bridge CFArrayRef)gradientPurpleColors, gradientPurpleLocations);
     
     //// Frames
     CGRect bubbleFrame = self.bounds;
-
+    
+    
     //// Rounded Rectangle Drawing
     CGRect roundedRectangleRect = CGRectMake(CGRectGetMinX(bubbleFrame), CGRectGetMinY(bubbleFrame), CGRectGetWidth(bubbleFrame), CGRectGetHeight(bubbleFrame));
     UIBezierPath* roundedRectanglePath = [UIBezierPath bezierPathWithRoundedRect: roundedRectangleRect byRoundingCorners: UIRectCornerTopLeft | UIRectCornerBottomLeft cornerRadii: CGSizeMake(5, 5)];
@@ -69,7 +73,7 @@
                                 CGPointMake(CGRectGetMidX(roundedRectangleRect), CGRectGetMaxY(roundedRectangleRect)),
                                 0);
     CGContextRestoreGState(context);
-    [color7 setStroke];
+    [[UIColor clearColor] setStroke];
     roundedRectanglePath.lineWidth = 0.5;
     [roundedRectanglePath stroke];
     

@@ -51,18 +51,19 @@
     UIColor* bubbleStrokeColor = [UIColor colorWithRed: 0.231 green: 0.231 blue: 0.231 alpha: 1];
     
     //// Gradient Declarations
+    NSArray* bubbleGradientColors = [NSArray arrayWithObjects:
+                                     (id)bubbleGradientTop.CGColor,
+                                     (id)bubbleGradientBottom.CGColor, nil];
     CGFloat bubbleGradientLocations[] = {0, 1};
-    CGGradientRef bubbleGradient = CGGradientCreateWithColors(colorSpace, (__bridge CFArrayRef)@[(id)bubbleGradientTop.CGColor, (id)bubbleGradientBottom.CGColor], bubbleGradientLocations);
+    CGGradientRef bubbleGradient = CGGradientCreateWithColors(colorSpace, (__bridge CFArrayRef)bubbleGradientColors, bubbleGradientLocations);
     
     //// Shadow Declarations
-    NSShadow* outerShadow = [[NSShadow alloc] init];
-    [outerShadow setShadowColor: UIColor.blackColor];
-    [outerShadow setShadowOffset: CGSizeMake(0.1, 6.1)];
-    [outerShadow setShadowBlurRadius: 13];
-    NSShadow* highlightShadow = [[NSShadow alloc] init];
-    [highlightShadow setShadowColor: bubbleHighlightColor];
-    [highlightShadow setShadowOffset: CGSizeMake(0.1, 2.1)];
-    [highlightShadow setShadowBlurRadius: 0];
+    UIColor* outerShadow = [UIColor blackColor];
+    CGSize outerShadowOffset = CGSizeMake(0.1, 6.1);
+    CGFloat outerShadowBlurRadius = 13;
+    UIColor* highlightShadow = bubbleHighlightColor;
+    CGSize highlightShadowOffset = CGSizeMake(0.1, 2.1);
+    CGFloat highlightShadowBlurRadius = 0;
     
     //// Frames
     CGRect bubbleFrame = self.bounds;
@@ -87,7 +88,7 @@
     [bubblePath addCurveToPoint: CGPointMake(CGRectGetMaxX(bubbleFrame) - 12, CGRectGetMinY(bubbleFrame) + 28.5) controlPoint1: CGPointMake(CGRectGetMaxX(bubbleFrame) - 17.82, CGRectGetMinY(bubbleFrame) + 15.5) controlPoint2: CGPointMake(CGRectGetMaxX(bubbleFrame) - 12, CGRectGetMinY(bubbleFrame) + 21.32)];
     [bubblePath closePath];
     CGContextSaveGState(context);
-    CGContextSetShadowWithColor(context, outerShadow.shadowOffset, outerShadow.shadowBlurRadius, [outerShadow.shadowColor CGColor]);
+    CGContextSetShadowWithColor(context, outerShadowOffset, outerShadowBlurRadius, outerShadow.CGColor);
     CGContextBeginTransparencyLayer(context, NULL);
     [bubblePath addClip];
     CGRect bubbleBounds = CGPathGetPathBoundingBox(bubblePath.CGPath);
@@ -98,24 +99,29 @@
     CGContextEndTransparencyLayer(context);
     
     ////// Bubble Inner Shadow
-    CGContextSaveGState(context);
-    UIRectClip(bubblePath.bounds);
-    CGContextSetShadowWithColor(context, CGSizeZero, 0, NULL);
+    CGRect bubbleBorderRect = CGRectInset([bubblePath bounds], -highlightShadowBlurRadius, -highlightShadowBlurRadius);
+    bubbleBorderRect = CGRectOffset(bubbleBorderRect, -highlightShadowOffset.width, -highlightShadowOffset.height);
+    bubbleBorderRect = CGRectInset(CGRectUnion(bubbleBorderRect, [bubblePath bounds]), -1, -1);
     
-    CGContextSetAlpha(context, CGColorGetAlpha([highlightShadow.shadowColor CGColor]));
-    CGContextBeginTransparencyLayer(context, NULL);
+    UIBezierPath* bubbleNegativePath = [UIBezierPath bezierPathWithRect: bubbleBorderRect];
+    [bubbleNegativePath appendPath: bubblePath];
+    bubbleNegativePath.usesEvenOddFillRule = YES;
+    
+    CGContextSaveGState(context);
     {
-        UIColor* opaqueShadow = [highlightShadow.shadowColor colorWithAlphaComponent: 1];
-        CGContextSetShadowWithColor(context, highlightShadow.shadowOffset, highlightShadow.shadowBlurRadius, [opaqueShadow CGColor]);
-        CGContextSetBlendMode(context, kCGBlendModeSourceOut);
-        CGContextBeginTransparencyLayer(context, NULL);
+        CGFloat xOffset = highlightShadowOffset.width + round(bubbleBorderRect.size.width);
+        CGFloat yOffset = highlightShadowOffset.height;
+        CGContextSetShadowWithColor(context,
+                                    CGSizeMake(xOffset + copysign(0.1, xOffset), yOffset + copysign(0.1, yOffset)),
+                                    highlightShadowBlurRadius,
+                                    highlightShadow.CGColor);
         
-        [opaqueShadow setFill];
-        [bubblePath fill];
-        
-        CGContextEndTransparencyLayer(context);
+        [bubblePath addClip];
+        CGAffineTransform transform = CGAffineTransformMakeTranslation(-round(bubbleBorderRect.size.width), 0);
+        [bubbleNegativePath applyTransform: transform];
+        [[UIColor grayColor] setFill];
+        [bubbleNegativePath fill];
     }
-    CGContextEndTransparencyLayer(context);
     CGContextRestoreGState(context);
     
     CGContextRestoreGState(context);
